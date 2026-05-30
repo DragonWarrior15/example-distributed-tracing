@@ -1,0 +1,8 @@
+# env
+.venv
+
+# ds store
+.DS_Store
+
+# python
+__pycache__
