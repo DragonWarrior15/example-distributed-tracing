@@ -1,0 +1,5 @@
+# env
+.venv
+
+# ds store
+.DS_Store
