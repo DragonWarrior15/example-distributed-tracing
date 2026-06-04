@@ -4,8 +4,10 @@ import logging
 import random
 
 from fastapi import FastAPI
+import httpx
 
 from opentelemetry import trace
+
 
 # create the logger
 logger = logging.getLogger("uvicorn.error")
@@ -30,41 +32,28 @@ def run():
 
         logger.info(f"Generated random int {r}")
 
+        route = None
         if r < 10:
-            return run1(r)
+            route = "http://localhost:8081/run1"
         else:
-            return run2(r)
+            route = "http://localhost:8081/run2"
 
+        with httpx.Client() as client:
+            response = client.post(route, json={"r": r})
+            body = response.json()
+            return body["r"]
 
-# more endpoints to run trace across multiple hops
-@app.get("/run1")
-def run1(r: int):
-    """Sets a custom field value to the double of input."""
-
-    # to see attributes from function, we need custom spans
-    with tracer.start_as_current_span("route_run1_custom_logic") as span:
-        r *= 2
-
-        # set a custom span attribute
-        span.set_attribute("function.result", r)
-
-        logger.info(f"Doubled random int to {r}")
-
-        return r
-
-
-# more endpoints to run trace across multiple hops
-@app.get("/run2")
-def run2(r: int):
-    """Sets a custom field value to the double of input."""
+@app.get("/run_simple")
+def run_simple():
+    """Generate a random number and return the response."""
 
     # to see attributes from function, we need custom spans
-    with tracer.start_as_current_span("route_run2_custom_logic") as span:
-        r //= 2
+    with tracer.start_as_current_span("route_run_simple_custom_logic") as span:
+        r = random.randint(1, 20)
 
         # set a custom span attribute
-        span.set_attribute("function.result", r)
+        span.set_attribute("math.result", r)
 
-        logger.info(f"Halved random int to {r}")
+        logger.info(f"Generated random int {r}")
 
         return r
