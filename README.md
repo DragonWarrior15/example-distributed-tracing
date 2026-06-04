@@ -15,7 +15,8 @@ example repository for distributed tracing implementation
         --logs_exporter console \
         uvicorn app:app --host 0.0.0.0 --port 8000
     ```
-- Send a request from the second terminal `curl http://0.0.0.0:8000/run`
+- **Note:** `opentelemetry-instrument` is important to allow automatic instrumentation of all the installe libraries
+- Send a request from the second terminal `curl http://0.0.0.0:8000/run_simple`
 - In the first terminal, logs will come along with a large `JSON` containing trace information
 
 ## Visualize in Jaeger
@@ -37,5 +38,32 @@ example repository for distributed tracing implementation
         --metrics_exporter otlp \
         uvicorn app:app --host 0.0.0.0 --port 8000
     ```
-- Run a `cURL` request `curl http://0.0.0.0:8000/run` and visualize the results in `Jaeger`
+- Run a `cURL` request `curl http://0.0.0.0:8000/run_simple` and visualize the results in `Jaeger`
 ![Jaeger](images/jaeger_01.png)
+
+## More experiments
+### Error view
+Error view in Jaeger
+
+![Jaeger Error](images/jaeger_02.png)
+
+### Trace across servers
+- In terminal 1, run
+    ```bash
+    opentelemetry-instrument \
+        --service_name fastapi-random-generator \
+        --traces_exporter otlp \
+        --metrics_exporter otlp \
+        uvicorn app:app --host 0.0.0.0 --port 8000
+    ```
+- In terminal 2, run
+    ```bash
+    opentelemetry-instrument \
+        --service_name fastapi-random-generator \
+        --traces_exporter otlp \
+        --metrics_exporter otlp \
+        uvicorn app_2:app --host 0.0.0.0 --port 8000
+    ```
+- In terminal 3, run Jaeger using the earlier command
+- Trace across hops is visible
+    ![Jaeger Multiple Servers](images/jaeger_03.png)
