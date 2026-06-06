@@ -67,3 +67,6 @@ Error view in Jaeger
 - In terminal 3, run Jaeger using the earlier command
 - Trace across hops is visible
     ![Jaeger Multiple Servers](images/jaeger_03.png)
+
+### Introduce Local DB
+- Check this [README](local_db_setup/README.md) to setup a local database

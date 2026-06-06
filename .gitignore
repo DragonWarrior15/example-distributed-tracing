@@ -6,3 +6,6 @@
 
 # python
 __pycache__
+
+# Local DB
+local_db.db
