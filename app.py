@@ -33,7 +33,7 @@ def run():
         logger.info(f"Generated random int {r}")
 
         route = None
-        if r < 10:
+        if r < 15:
             route = "http://localhost:8081/run1"
         else:
             route = "http://localhost:8081/run2"

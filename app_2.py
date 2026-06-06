@@ -1,6 +1,7 @@
 """Trivial instrumentation example."""
 
 import logging
+import sqlite3
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
@@ -36,6 +37,13 @@ async def run1(request: Request) -> JSONResponse:
 
         logger.info(f"Doubled random int to {r}")
 
+        # get the square of this number from db
+        s = get_square_from_db(r)
+
+        span.set_attribute("function.square", s)
+
+        logger.info(f"Square of random int is {s}")
+
         return JSONResponse(content={"r": r})
 
 
@@ -59,3 +67,18 @@ async def run2(request: Request) -> JSONResponse:
         logger.info(f"Halved random int to {r}")
 
         return JSONResponse(content={"r": r})
+
+def get_square_from_db(num: int) -> int:
+    connection = sqlite3.connect("local_db_setup/local_db.db")
+    cursor = connection.cursor()
+
+    data = cursor.execute(f"SELECT square FROM squares where num = {num}")
+
+    if not data:
+        connection.close()
+        return None
+    
+    for row in data:
+        x = row[0]
+        connection.close()
+        return x
